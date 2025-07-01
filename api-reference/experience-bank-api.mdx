@@ -1,0 +1,378 @@
+---
+title: 'Experience Bank Partner API'
+description: 'External partner integration API for tour operators'
+---
+
+## Overview
+
+The Experience Bank Partner API enables external tour operators to integrate with the Turismoi platform. This API uses HMAC-SHA256 authentication and provides endpoints for activities, availability checks, and booking management.
+
+**Base URL**: `https://experiencebank.turismoi.com/`
+
+## Authentication
+
+The Experience Bank Partner API uses HMAC-SHA256 signature authentication with public/private key pairs.
+
+### Required Headers
+
+```http
+Authorization: YOUR_PUBLIC_KEY:HMAC_SIGNATURE
+X-REQUEST-IDENTIFIER: TIMESTAMP_BASED_IDENTIFIER
+```
+
+### Generating HMAC Signature
+
+1. Create a canonical string from the request
+2. Generate HMAC-SHA256 signature using your private key
+3. Include the signature in the Authorization header
+
+**Example signature generation (Ruby):**
+
+```ruby
+def generate_signature(method, path, query_params, private_key)
+  canonical_string = "#{method.upcase}\n#{path}\n#{query_params.to_query}"
+  OpenSSL::HMAC.hexdigest('SHA256', private_key, canonical_string)
+end
+```
+
+## Health Check
+
+### Ping
+
+<ResponseExample>
+```http
+GET /ping
+```
+</ResponseExample>
+
+Health check endpoint to verify API connectivity.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-07-01T12:00:00Z",
+  "version": "1.0.0"
+}
+```
+
+## Activities
+
+### List Activities
+
+<ResponseExample>
+```http
+GET /supplier/{partnerSupplierId}/activities
+```
+</ResponseExample>
+
+Retrieve available activities for a partner supplier.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `partnerSupplierId` | string | Partner supplier identifier |
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | number | Page number for pagination |
+| `per_page` | number | Items per page (max 100) |
+| `category` | string | Filter by activity category |
+| `location` | string | Filter by location |
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "id": "activity_123",
+      "name": "City Walking Tour",
+      "description": "Explore the historic city center with a professional guide",
+      "category": "cultural",
+      "location": {
+        "city": "Lima",
+        "country": "Peru",
+        "coordinates": {
+          "latitude": -12.0464,
+          "longitude": -77.0428
+        }
+      },
+      "duration": {
+        "hours": 3,
+        "minutes": 0
+      },
+      "max_participants": 20,
+      "min_participants": 2,
+      "languages": ["es", "en"],
+      "inclusions": [
+        "Professional guide",
+        "Map and materials"
+      ],
+      "exclusions": [
+        "Food and beverages",
+        "Transportation"
+      ],
+      "images": [
+        {
+          "url": "https://example.com/activity1.jpg",
+          "caption": "Tour group at main square"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total": 50,
+    "page": 1,
+    "per_page": 25,
+    "total_pages": 2
+  }
+}
+```
+
+## Availability
+
+### Check Availability
+
+<ResponseExample>
+```http
+GET /supplier/{partnerSupplierId}/availabilities
+```
+</ResponseExample>
+
+Check availability for activities within a date range.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `partnerSupplierId` | string | Partner supplier identifier |
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `activity_id` | string | Yes | Activity identifier |
+| `start_date` | date | Yes | Start date (YYYY-MM-DD) |
+| `end_date` | date | Yes | End date (YYYY-MM-DD) |
+| `participants` | number | Yes | Number of participants |
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "date": "2024-08-15",
+      "time_slots": [
+        {
+          "start_time": "09:00",
+          "end_time": "12:00",
+          "available_spots": 15,
+          "price": {
+            "adult": 45.00,
+            "child": 35.00,
+            "currency": "USD"
+          },
+          "booking_code": "SLOT_789"
+        },
+        {
+          "start_time": "14:00",
+          "end_time": "17:00",
+          "available_spots": 20,
+          "price": {
+            "adult": 45.00,
+            "child": 35.00,
+            "currency": "USD"
+          },
+          "booking_code": "SLOT_790"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Bookings
+
+### Create Booking
+
+<ResponseExample>
+```http
+POST /supplier/{partnerSupplierId}/booking
+```
+</ResponseExample>
+
+Create a new booking for an activity.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `partnerSupplierId` | string | Partner supplier identifier |
+
+**Request Body:**
+
+```json
+{
+  "booking": {
+    "activity_id": "activity_123",
+    "booking_code": "SLOT_789",
+    "date": "2024-08-15",
+    "start_time": "09:00",
+    "participants": [
+      {
+        "type": "adult",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john@example.com",
+        "phone": "+1234567890",
+        "special_requirements": "Vegetarian meal"
+      },
+      {
+        "type": "child",
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "age": 8,
+        "special_requirements": null
+      }
+    ],
+    "contact": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567890"
+    },
+    "reference": "EXT_BOOKING_123",
+    "special_requests": "Early pickup preferred"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "booking_id": "booking_456",
+    "status": "confirmed",
+    "confirmation_code": "CONF_ABC123",
+    "activity": {
+      "id": "activity_123",
+      "name": "City Walking Tour"
+    },
+    "schedule": {
+      "date": "2024-08-15",
+      "start_time": "09:00",
+      "end_time": "12:00"
+    },
+    "participants": 2,
+    "total_price": {
+      "amount": 80.00,
+      "currency": "USD"
+    },
+    "contact_info": {
+      "guide_name": "Maria Garcia",
+      "guide_phone": "+51987654321",
+      "meeting_point": "Main Plaza, in front of the cathedral"
+    },
+    "cancellation_policy": {
+      "free_cancellation_until": "2024-08-13T23:59:59Z",
+      "cancellation_fee": 25.00
+    }
+  }
+}
+```
+
+### Cancel Booking
+
+<ResponseExample>
+```http
+POST /supplier/{partnerSupplierId}/booking/{bookingId}/cancellation
+```
+</ResponseExample>
+
+Cancel an existing booking.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `partnerSupplierId` | string | Partner supplier identifier |
+| `bookingId` | string | Booking identifier |
+
+**Request Body:**
+
+```json
+{
+  "cancellation": {
+    "reason": "Customer request",
+    "requested_by": "john@example.com"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "booking_id": "booking_456",
+    "status": "cancelled",
+    "cancellation": {
+      "cancelled_at": "2024-07-01T12:00:00Z",
+      "reason": "Customer request",
+      "refund_amount": 60.00,
+      "refund_currency": "USD",
+      "processing_time": "3-5 business days"
+    }
+  }
+}
+```
+
+## Error Handling
+
+The Experience Bank Partner API uses structured error responses:
+
+```json
+{
+  "errors": [
+    {
+      "code": "INVALID_PARTNER_SUPPLIER",
+      "message": "Partner supplier not found or inactive",
+      "details": {
+        "partner_supplier_id": "invalid_id"
+      }
+    }
+  ]
+}
+```
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| `INVALID_SIGNATURE` | HMAC signature validation failed |
+| `INVALID_PARTNER_SUPPLIER` | Partner supplier not found or inactive |
+| `ACTIVITY_NOT_FOUND` | Requested activity does not exist |
+| `NO_AVAILABILITY` | No availability for requested date/time |
+| `BOOKING_NOT_FOUND` | Booking not found |
+| `CANCELLATION_NOT_ALLOWED` | Booking cannot be cancelled (too late or already cancelled) |
+| `INVALID_DATE_RANGE` | Date range exceeds maximum allowed period |
+
+## Rate Limiting
+
+- **Activities endpoint**: 100 requests per minute
+- **Availability endpoint**: 200 requests per minute  
+- **Booking endpoints**: 50 requests per minute
+
+<Note>
+Date parameters must be in YYYY-MM-DD format. The API supports a maximum date range of 90 days for availability checks.
+</Note>
+
+<Warning>
+All booking operations are final. Once a booking is confirmed, modifications require cancellation and rebooking.
+</Warning>

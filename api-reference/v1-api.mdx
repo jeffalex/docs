@@ -1,0 +1,330 @@
+---
+title: 'V1 API Endpoints'
+description: 'Main booking and tour management API endpoints'
+---
+
+## Overview
+
+The V1 API is the main booking and tour management system. All endpoints are prefixed with `/api/` and use version constraints.
+
+**Base URL**: `https://api.turismoi.com/api/`
+
+## Authentication
+
+Most endpoints require JWT authentication:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+Some booking operations require private tokens:
+
+```http
+Authorization: YOUR_PRIVATE_TOKEN
+```
+
+## Tours API
+
+### List Tours
+
+<ResponseExample>
+```http
+GET /api/tours
+```
+</ResponseExample>
+
+Retrieve a list of tours with advanced filtering and search capabilities.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `search` | string | Search term for tour names and descriptions |
+| `categories[]` | array | Filter by category IDs |
+| `cities[]` | array | Filter by city IDs |
+| `activities[]` | array | Filter by activity IDs |
+| `price_min` | number | Minimum price filter |
+| `price_max` | number | Maximum price filter |
+| `has_housing` | boolean | Filter tours with housing |
+| `has_transport` | boolean | Filter tours with transport |
+| `departure_date` | date | Filter by departure date (YYYY-MM-DD) |
+| `language` | string | Language code (`es`, `en`) |
+| `page` | number | Page number for pagination |
+| `per_page` | number | Items per page (max 100) |
+
+**Special Headers:**
+
+| Header | Description |
+|--------|-------------|
+| `Accept-Related-Tours` | Include related tours in response |
+| `Accept-Search-Filters` | Include available filters in response |
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "id": "tour_123",
+      "type": "tours",
+      "attributes": {
+        "name": "Amazing Tour Package",
+        "description": "Experience the best of our destination",
+        "price": {
+          "amount": 299.99,
+          "currency": "USD"
+        },
+        "duration": {
+          "days": 3,
+          "nights": 2
+        },
+        "categories": ["adventure", "cultural"],
+        "cities": ["lima", "cusco"],
+        "activities": ["hiking", "museum"],
+        "has_housing": true,
+        "has_transport": true,
+        "departure_dates": ["2024-07-15", "2024-07-22"],
+        "images": [
+          {
+            "url": "https://example.com/image1.jpg",
+            "alt": "Tour image"
+          }
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "total": 150,
+    "page": 1,
+    "per_page": 25,
+    "total_pages": 6
+  },
+  "links": {
+    "first": "/api/tours?page=1",
+    "last": "/api/tours?page=6",
+    "prev": null,
+    "next": "/api/tours?page=2"
+  }
+}
+```
+
+### Get Tour Details
+
+<ResponseExample>
+```http
+GET /api/tours/{id}
+```
+</ResponseExample>
+
+Retrieve detailed information about a specific tour.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | string | Tour ID |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "tour_123",
+    "type": "tours",
+    "attributes": {
+      "name": "Amazing Tour Package",
+      "description": "Detailed tour description...",
+      "price": {
+        "amount": 299.99,
+        "currency": "USD",
+        "price_by_quantity": [
+          {
+            "quantity": 1,
+            "price": 299.99
+          },
+          {
+            "quantity": 2,
+            "price": 579.98
+          }
+        ],
+        "price_by_season": [
+          {
+            "start_date": "2024-06-01",
+            "end_date": "2024-08-31",
+            "price": 329.99
+          }
+        ]
+      },
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Arrival and City Tour",
+          "description": "Welcome to the city...",
+          "activities": ["city_tour", "welcome_dinner"]
+        }
+      ],
+      "included": [
+        "Accommodation",
+        "Transportation",
+        "Professional guide"
+      ],
+      "not_included": [
+        "International flights",
+        "Personal expenses"
+      ]
+    }
+  }
+}
+```
+
+## Countries & Locations API
+
+### Get Regions
+
+<ResponseExample>
+```http
+GET /api/get_regions/{country_id}
+```
+</ResponseExample>
+
+Get regions for a specific country.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `country_id` | number | Country ID |
+
+### Get Provinces
+
+<ResponseExample>
+```http
+GET /api/get_provinces/{region_id}
+```
+</ResponseExample>
+
+Get provinces for a specific region.
+
+### Get Districts
+
+<ResponseExample>
+```http
+GET /api/get_districts/{province_id}
+```
+</ResponseExample>
+
+Get districts for a specific province.
+
+### Custom Cities
+
+<ResponseExample>
+```http
+GET /api/custom_cities
+```
+</ResponseExample>
+
+Get custom cities with optional country filtering.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `country_id` | number | Filter by country ID |
+| `language` | string | Language code (`es`, `en`) |
+
+### All Cities
+
+<ResponseExample>
+```http
+GET /api/all_cities
+```
+</ResponseExample>
+
+Get all cities with tour search integration.
+
+## Currency API
+
+### Currency List
+
+<ResponseExample>
+```http
+GET /api/currency_list
+```
+</ResponseExample>
+
+Get list of supported currencies.
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "code": "USD",
+      "name": "US Dollar",
+      "symbol": "$"
+    },
+    {
+      "code": "EUR",
+      "name": "Euro",
+      "symbol": "€"
+    }
+  ]
+}
+```
+
+### Exchange Rates
+
+<ResponseExample>
+```http
+GET /api/currency_exchange_rate
+```
+</ResponseExample>
+
+Get current exchange rates.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `from` | string | Source currency code |
+| `to` | string | Target currency code |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "from": "USD",
+    "to": "EUR",
+    "rate": 0.85,
+    "updated_at": "2024-07-01T12:00:00Z"
+  }
+}
+```
+
+## Authentication Tokens
+
+### Reseller Token
+
+<ResponseExample>
+```http
+GET /api/reseller_tokens/{token}
+```
+</ResponseExample>
+
+Get reseller data by MD5 token (internal use only).
+
+### Reseller User Token
+
+<ResponseExample>
+```http
+GET /api/reseller_user_tokens/{token}
+```
+</ResponseExample>
+
+Get reseller user data by token (internal use only).
+
+<Note>
+Token endpoints are for internal system integration only and require special authorization.
+</Note>

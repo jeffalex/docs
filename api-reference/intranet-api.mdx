@@ -1,0 +1,360 @@
+---
+title: 'Intranet API'
+description: 'Internal systems integration API for data synchronization'
+---
+
+## Overview
+
+The Intranet API provides internal system integration capabilities for tour and order management, stock synchronization, and data updates. This API is designed for internal use and system-to-system communication.
+
+**Base URL**: `https://api.turismoi.com/intranet/`
+
+## Authentication
+
+The Intranet API uses Basic Authentication with environment-based secret keys:
+
+```http
+Authorization: Basic BASE64_ENCODED_CREDENTIALS
+```
+
+The credentials should be base64 encoded in the format `username:INTRANET_SECRET_KEY`.
+
+## Orders Management
+
+### Update Order State
+
+<ResponseExample>
+```http
+PUT /intranet/orders/{id}/change_state
+```
+</ResponseExample>
+
+Update the state of an existing order.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | number | Order ID |
+
+**Request Body:**
+
+```json
+{
+  "state": "confirmed",
+  "reason": "Payment processed successfully",
+  "updated_by": "system_user",
+  "metadata": {
+    "payment_id": "pay_123456",
+    "confirmation_code": "CONF_ABC123"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": 12345,
+    "state": "confirmed",
+    "previous_state": "pending",
+    "updated_at": "2024-07-01T12:00:00Z",
+    "updated_by": "system_user",
+    "state_history": [
+      {
+        "state": "pending",
+        "timestamp": "2024-07-01T10:00:00Z",
+        "updated_by": "api_user"
+      },
+      {
+        "state": "confirmed",
+        "timestamp": "2024-07-01T12:00:00Z",
+        "updated_by": "system_user"
+      }
+    ]
+  }
+}
+```
+
+**Order States:**
+
+| State | Description |
+|-------|-------------|
+| `pending` | Order created, awaiting payment |
+| `confirmed` | Payment confirmed, order active |
+| `cancelled` | Order cancelled by user or system |
+| `completed` | Service completed successfully |
+| `refunded` | Order refunded |
+
+## Tours Management
+
+### Synchronize Tour
+
+<ResponseExample>
+```http
+PUT /intranet/tours/{id}/synchronize
+```
+</ResponseExample>
+
+Synchronize tour data with external systems and update search indices.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | number | Tour ID |
+
+**Request Body:**
+
+```json
+{
+  "sync_type": "full",
+  "update_elasticsearch": true,
+  "notify_experience_bank": true,
+  "fields": ["pricing", "availability", "description"]
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "tour_id": 12345,
+    "sync_status": "completed",
+    "sync_type": "full",
+    "started_at": "2024-07-01T12:00:00Z",
+    "completed_at": "2024-07-01T12:02:15Z",
+    "updated_fields": [
+      "pricing",
+      "availability", 
+      "description",
+      "search_index"
+    ],
+    "elasticsearch_updated": true,
+    "experience_bank_notified": true,
+    "errors": []
+  }
+}
+```
+
+**Sync Types:**
+
+| Type | Description |
+|------|-------------|
+| `full` | Complete tour data synchronization |
+| `pricing` | Pricing and availability updates only |
+| `content` | Description, images, and content updates |
+| `index` | Search index update only |
+
+## Stock Management
+
+### Update All Cached Stocks
+
+<ResponseExample>
+```http
+PUT /intranet/tours/{tour_id}/cached_stocks/update_all
+```
+</ResponseExample>
+
+Update all cached stock records for a specific tour.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tour_id` | number | Tour ID |
+
+**Request Body:**
+
+```json
+{
+  "force_refresh": true,
+  "date_range": {
+    "start_date": "2024-07-01",
+    "end_date": "2024-12-31"
+  },
+  "async": true
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "job_id": "stock_update_789",
+    "status": "queued",
+    "tour_id": 12345,
+    "estimated_completion": "2024-07-01T12:05:00Z",
+    "progress": {
+      "total_dates": 184,
+      "processed_dates": 0,
+      "failed_dates": 0
+    }
+  }
+}
+```
+
+### Synchronize Cached Stocks
+
+<ResponseExample>
+```http
+PUT /intranet/tours/{tour_id}/cached_stocks/synchronize
+```
+</ResponseExample>
+
+Synchronize cached stock data with external inventory systems.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tour_id` | number | Tour ID |
+
+**Request Body:**
+
+```json
+{
+  "sync_method": "incremental",
+  "external_system": "tour_operator_api",
+  "date_range": {
+    "start_date": "2024-07-01",
+    "end_date": "2024-07-31"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "sync_id": "sync_456",
+    "status": "in_progress",
+    "tour_id": 12345,
+    "sync_method": "incremental",
+    "external_system": "tour_operator_api",
+    "started_at": "2024-07-01T12:00:00Z",
+    "progress": {
+      "total_records": 31,
+      "synchronized": 15,
+      "failed": 0,
+      "conflicts": 2
+    },
+    "conflicts": [
+      {
+        "date": "2024-07-15",
+        "local_stock": 10,
+        "external_stock": 8,
+        "resolution": "manual_review_required"
+      }
+    ]
+  }
+}
+```
+
+## Async Job Status
+
+All long-running operations return job IDs that can be used to check status:
+
+<ResponseExample>
+```http
+GET /intranet/jobs/{job_id}/status
+```
+</ResponseExample>
+
+**Response:**
+
+```json
+{
+  "data": {
+    "job_id": "stock_update_789",
+    "status": "completed",
+    "started_at": "2024-07-01T12:00:00Z",
+    "completed_at": "2024-07-01T12:03:45Z",
+    "progress": {
+      "total_dates": 184,
+      "processed_dates": 184,
+      "failed_dates": 2
+    },
+    "errors": [
+      {
+        "date": "2024-08-15",
+        "error": "External API timeout"
+      }
+    ],
+    "results": {
+      "updated_records": 182,
+      "created_records": 0,
+      "deleted_records": 5
+    }
+  }
+}
+```
+
+## Error Handling
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| `UNAUTHORIZED` | Invalid or missing authentication credentials |
+| `TOUR_NOT_FOUND` | Specified tour does not exist |
+| `ORDER_NOT_FOUND` | Specified order does not exist |
+| `INVALID_STATE_TRANSITION` | Requested state change is not allowed |
+| `SYNC_IN_PROGRESS` | Another synchronization is already running |
+| `EXTERNAL_API_ERROR` | Error communicating with external system |
+| `JOB_NOT_FOUND` | Async job ID not found |
+
+### Error Response Format
+
+```json
+{
+  "errors": [
+    {
+      "code": "TOUR_NOT_FOUND",
+      "message": "Tour with ID 12345 not found",
+      "details": {
+        "tour_id": 12345,
+        "requested_operation": "synchronize"
+      }
+    }
+  ]
+}
+```
+
+## Integration Notes
+
+### Elasticsearch Integration
+
+Tours synchronization automatically updates Elasticsearch indices for:
+- Search functionality
+- Filtering and aggregations
+- Real-time availability
+- Pricing updates
+
+### Experience Bank Notifications
+
+When `notify_experience_bank` is enabled, the system will:
+- Send stock updates to Experience Bank partners
+- Notify about price changes
+- Update availability calendars
+- Trigger partner webhook notifications
+
+### Job Queue System
+
+Long-running operations use the delayed job system:
+- Jobs are queued for background processing
+- Progress can be tracked via job status endpoints
+- Failed jobs are automatically retried with exponential backoff
+- Job results are stored for 24 hours
+
+<Warning>
+Intranet API endpoints are for internal system use only. They require special authentication and should not be exposed to public networks.
+</Warning>
+
+<Note>
+All date parameters should be in YYYY-MM-DD format. Stock synchronization operations may take several minutes for large date ranges.
+</Note>

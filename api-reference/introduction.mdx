@@ -1,33 +1,123 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Introduction'
+description: 'Comprehensive API documentation for Turismoi API Global'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Welcome to Turismoi API Global
 
-## Welcome
+Turismoi API Global is a comprehensive tourism platform API that provides booking services, tour management, and partner integrations. This documentation covers all available API endpoints, authentication methods, and integration patterns.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+## Base URLs
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+Our API is organized into several modules with different base URLs:
 
-## Authentication
+- **V1 API**: `https://api.turismoi.com/api/` (Main booking and tour management API)
+- **Experience Bank Partner API**: `https://experiencebank.turismoi.com/` (Partner integration API)
+- **Intranet API**: `https://api.turismoi.com/intranet/` (Internal systems API)
+- **Tour CMS Webhooks**: `https://api.turismoi.com/` (CMS integration webhooks)
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+## Authentication Methods
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+### JWT Authentication (V1 API)
+Most V1 API endpoints use JWT tokens for authentication. Include the token in the Authorization header:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
 ```
+
+### Private Token Authentication (Booking Operations)
+Sensitive booking operations require private tokens stored in reseller records:
+
+```http
+Authorization: YOUR_PRIVATE_TOKEN
+```
+
+### HMAC Signature Authentication (Experience Bank Partner API)
+Partner API uses HMAC-SHA256 signatures with public/private key pairs:
+
+```http
+Authorization: YOUR_PUBLIC_KEY:HMAC_SIGNATURE
+X-REQUEST-IDENTIFIER: TIMESTAMP_BASED_IDENTIFIER
+```
+
+### Basic Authentication (Intranet API)
+Internal API uses basic authentication with secret keys:
+
+```http
+Authorization: Basic BASE64_ENCODED_CREDENTIALS
+```
+
+## API Features
+
+<CardGroup cols={2}>
+  <Card title="Tour Management" icon="map">
+    Search, filter, and manage tours with advanced filtering capabilities
+  </Card>
+  <Card title="Booking System" icon="calendar">
+    Complete booking workflow from cart creation to payment processing
+  </Card>
+  <Card title="Partner Integration" icon="handshake">
+    Experience Bank Partner API for external tour operators
+  </Card>
+  <Card title="Multi-language Support" icon="globe">
+    Spanish and English language support across all endpoints
+  </Card>
+</CardGroup>
+
+## Common Response Formats
+
+### Success Response
+```json
+{
+  "data": {
+    // Response data
+  },
+  "meta": {
+    "total": 100,
+    "page": 1,
+    "per_page": 25
+  }
+}
+```
+
+### Error Response
+```json
+{
+  "errors": [
+    {
+      "code": "VALIDATION_ERROR",
+      "message": "Invalid parameters provided",
+      "details": {
+        // Error details
+      }
+    }
+  ]
+}
+```
+
+## Rate Limiting
+
+API requests are subject to rate limiting based on your authentication level:
+- **Public endpoints**: 100 requests per minute
+- **Authenticated endpoints**: 1000 requests per minute
+- **Partner API**: 500 requests per minute
+
+## Getting Started
+
+1. **Choose your integration type**:
+   - Use V1 API for standard booking and tour management
+   - Use Experience Bank Partner API for external tour operator integration
+   - Use Intranet API for internal system integration
+
+2. **Obtain authentication credentials**:
+   - Contact support@turismoi.com for API access
+   - Provide your business details and use case
+
+3. **Test your integration**:
+   - Use the provided sandbox environment
+   - Review the example requests and responses
+
+<Note>
+  All API endpoints support both Spanish (`es`) and English (`en`) language parameters. 
+  The default language is Spanish if not specified.
+</Note>

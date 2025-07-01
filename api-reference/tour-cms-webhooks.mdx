@@ -1,0 +1,320 @@
+---
+title: 'Tour CMS Webhooks'
+description: 'Webhook endpoints for Tour CMS integration and booking notifications'
+---
+
+## Overview
+
+The Tour CMS Webhooks provide integration points for external content management systems and booking platforms. These endpoints handle booking notifications, availability checks, and pricing updates from external tour operators.
+
+**Base URL**: `https://api.turismoi.com/`
+
+## Authentication
+
+Tour CMS webhooks inherit authentication from the ApiController base class and use JWT-based authentication:
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Booking Notifications
+
+### Handle Booking Notification
+
+<ResponseExample>
+```http
+GET /booking_notification
+```
+</ResponseExample>
+
+Handle booking state notifications from external booking systems.
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `booking_id` | string | Yes | External booking identifier |
+| `status` | string | Yes | Booking status update |
+| `tour_id` | string | No | Associated tour identifier |
+| `notification_type` | string | No | Type of notification |
+
+**Booking Status Values:**
+
+| Status | Description |
+|--------|-------------|
+| `confirmed` | Booking confirmed and active |
+| `cancelled` | Booking cancelled |
+| `modified` | Booking details modified |
+| `completed` | Service completed |
+| `no_show` | Customer did not show up |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "notification_id": "notif_123",
+    "booking_id": "ext_booking_456",
+    "status": "confirmed",
+    "processed_at": "2024-07-01T12:00:00Z",
+    "actions_taken": [
+      "inventory_updated",
+      "customer_notified",
+      "partner_sync"
+    ],
+    "next_steps": [
+      "Send confirmation email",
+      "Update calendar availability"
+    ]
+  }
+}
+```
+
+### Create Booking Notification
+
+<ResponseExample>
+```http
+POST /booking_notification
+```
+</ResponseExample>
+
+Create a new booking notification entry.
+
+**Request Body:**
+
+```json
+{
+  "booking_notification": {
+    "external_booking_id": "ext_booking_789",
+    "tour_reference": "tour_123",
+    "status": "confirmed",
+    "booking_date": "2024-08-15",
+    "participants": 4,
+    "amount": 399.96,
+    "currency": "USD",
+    "customer_info": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+1234567890"
+    },
+    "metadata": {
+      "source_system": "palisis",
+      "operator_id": "op_456",
+      "confirmation_code": "CONF_ABC123"
+    }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "notification_id": "notif_124",
+    "status": "processed",
+    "booking_reference": "INT_BOOK_789",
+    "external_booking_id": "ext_booking_789",
+    "processed_at": "2024-07-01T12:00:00Z",
+    "integration_status": {
+      "inventory_updated": true,
+      "customer_notified": true,
+      "billing_created": true,
+      "partner_synced": true
+    }
+  }
+}
+```
+
+## Availability Checks
+
+### Check Availability Webhook
+
+<ResponseExample>
+```http
+POST /check_availability_webhook
+```
+</ResponseExample>
+
+Process availability checks with dynamic pricing calculations.
+
+**Request Body:**
+
+```json
+{
+  "availability_check": {
+    "tour_id": "tour_123",
+    "check_date": "2024-08-15",
+    "participants": {
+      "adults": 2,
+      "children": 1,
+      "infants": 0
+    },
+    "rate_type": "standard",
+    "external_reference": "check_456",
+    "requester": {
+      "system": "partner_api",
+      "operator_id": "op_789"
+    }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "check_id": "avail_check_789",
+    "tour_id": "tour_123",
+    "check_date": "2024-08-15",
+    "availability": {
+      "available": true,
+      "remaining_spots": 15,
+      "minimum_participants": 2,
+      "maximum_participants": 20
+    },
+    "pricing": {
+      "adult_price": 149.99,
+      "child_price": 119.99,
+      "infant_price": 0.00,
+      "currency": "USD",
+      "total_price": 419.97,
+      "rate_type": "standard",
+      "pricing_breakdown": [
+        {
+          "type": "adult",
+          "quantity": 2,
+          "unit_price": 149.99,
+          "subtotal": 299.98
+        },
+        {
+          "type": "child",
+          "quantity": 1,
+          "unit_price": 119.99,
+          "subtotal": 119.99
+        }
+      ]
+    },
+    "booking_conditions": {
+      "advance_booking_required": "24_hours",
+      "cancellation_policy": "free_24h",
+      "booking_deadline": "2024-08-14T23:59:59Z"
+    },
+    "additional_info": {
+      "meeting_point": "Hotel lobby at 8:00 AM",
+      "duration": "8 hours",
+      "included": ["Lunch", "Transportation", "Guide"],
+      "not_included": ["Drinks", "Tips"]
+    }
+  }
+}
+```
+
+## Integration with Palisis
+
+The Tour CMS webhooks integrate with the Palisis booking system for:
+
+### Stock Validation
+
+- Real-time availability checks
+- Dynamic inventory updates
+- Overbooking prevention
+- Multi-rate type support
+
+### Pricing Calculations
+
+- Seasonal pricing adjustments
+- Group discounts
+- Special rate types (standard, premium, promotional)
+- Currency conversion
+
+### Booking Processing
+
+- Automatic reservation creation
+- Confirmation code generation
+- Customer notification triggers
+- Inventory adjustment
+
+## Webhook Configuration
+
+### Setting Up Webhooks
+
+To configure webhooks from external systems:
+
+1. **Register your webhook endpoint** with Turismoi support
+2. **Obtain authentication credentials** (JWT tokens)
+3. **Configure your system** to send notifications to the webhook URLs
+4. **Test the integration** using the sandbox environment
+
+### Webhook Security
+
+- All webhooks require valid JWT authentication
+- Request signatures should be validated
+- Implement idempotency to handle duplicate notifications
+- Use HTTPS for all webhook communications
+
+### Retry Logic
+
+External systems should implement retry logic for failed webhook calls:
+
+- Retry failed requests with exponential backoff
+- Maximum of 5 retry attempts
+- Log all webhook interactions for debugging
+- Implement circuit breaker patterns for system protection
+
+## Error Handling
+
+### Common Error Scenarios
+
+| Error | Description | Resolution |
+|-------|-------------|------------|
+| `TOUR_NOT_FOUND` | Tour ID not found in system | Verify tour ID and sync catalogs |
+| `INVALID_DATE` | Date format or value invalid | Use YYYY-MM-DD format |
+| `NO_AVAILABILITY` | No stock available for date | Check alternative dates |
+| `PRICING_ERROR` | Error calculating prices | Verify rate configuration |
+| `BOOKING_FAILED` | Unable to create booking | Check inventory and retry |
+
+### Error Response Format
+
+```json
+{
+  "errors": [
+    {
+      "code": "TOUR_NOT_FOUND",
+      "message": "Tour with ID tour_123 not found",
+      "webhook_type": "availability_check",
+      "details": {
+        "tour_id": "tour_123",
+        "external_reference": "check_456"
+      }
+    }
+  ]
+}
+```
+
+## Monitoring and Logging
+
+### Webhook Monitoring
+
+All webhook interactions are logged with:
+- Request/response details
+- Processing timestamps
+- Error conditions
+- Performance metrics
+
+### Health Checks
+
+Monitor webhook health using:
+- Response time tracking
+- Success/failure rates
+- System availability
+- Queue depth monitoring
+
+<Note>
+Webhook endpoints are designed to handle high-volume traffic. Implement proper caching and rate limiting on your side to ensure optimal performance.
+</Note>
+
+<Warning>
+Webhook notifications should be processed idempotently. The same notification may be sent multiple times, so ensure your system can handle duplicate requests gracefully.
+</Warning>

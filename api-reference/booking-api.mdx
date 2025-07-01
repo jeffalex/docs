@@ -1,0 +1,412 @@
+---
+title: 'Booking API'
+description: 'Complete booking workflow from cart creation to payment processing'
+---
+
+## Overview
+
+The Booking API handles the complete booking workflow including shopping cart management, reservations, billing data, and payment processing.
+
+**Base URL**: `https://api.turismoi.com/api/booking/`
+
+## Authentication
+
+Booking endpoints use different authentication methods:
+
+- **JWT Authentication**: For viewing and basic operations
+- **Private Token**: For sensitive operations like payments
+
+```http
+Authorization: Bearer YOUR_JWT_TOKEN
+# OR
+Authorization: YOUR_PRIVATE_TOKEN
+```
+
+## Shopping Carts
+
+### Create Shopping Cart
+
+<ResponseExample>
+```http
+POST /api/booking/shopping_carts
+```
+</ResponseExample>
+
+Create a new shopping cart for tour booking.
+
+**Request Body:**
+
+```json
+{
+  "data": {
+    "type": "shopping_carts",
+    "attributes": {
+      "tour_id": "tour_123",
+      "departure_date": "2024-08-15",
+      "quantity": 2,
+      "price_type": "adult",
+      "language": "es",
+      "currency": "USD"
+    }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "cart_456",
+    "type": "shopping_carts",
+    "attributes": {
+      "tour_id": "tour_123",
+      "departure_date": "2024-08-15",
+      "quantity": 2,
+      "unit_price": 299.99,
+      "total_price": 599.98,
+      "currency": "USD",
+      "token": "unique_cart_token",
+      "expires_at": "2024-07-01T14:00:00Z",
+      "status": "active"
+    }
+  }
+}
+```
+
+### Get Shopping Cart
+
+<ResponseExample>
+```http
+GET /api/booking/shopping_carts/{id}
+```
+</ResponseExample>
+
+Retrieve shopping cart details.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | string | Shopping cart ID |
+
+### Update Shopping Cart
+
+<ResponseExample>
+```http
+PUT /api/booking/shopping_carts/{id}
+```
+</ResponseExample>
+
+Update shopping cart details (deprecated).
+
+### Delete Shopping Cart
+
+<ResponseExample>
+```http
+DELETE /api/booking/shopping_carts/{id}
+```
+</ResponseExample>
+
+Delete a shopping cart.
+
+### Apply Coupon
+
+<ResponseExample>
+```http
+POST /api/booking/shopping_carts/{id}/create_coupon
+```
+</ResponseExample>
+
+Apply a coupon code to the shopping cart.
+
+**Request Body:**
+
+```json
+{
+  "coupon_code": "SUMMER2024"
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "cart_456",
+    "type": "shopping_carts",
+    "attributes": {
+      "total_price": 599.98,
+      "discount_amount": 60.00,
+      "final_price": 539.98,
+      "coupon": {
+        "code": "SUMMER2024",
+        "discount_type": "percentage",
+        "discount_value": 10
+      }
+    }
+  }
+}
+```
+
+### Remove Coupon
+
+<ResponseExample>
+```http
+DELETE /api/booking/shopping_carts/{id}/delete_coupon
+```
+</ResponseExample>
+
+Remove applied coupon from shopping cart.
+
+## Reservations
+
+### Create Reservation
+
+<ResponseExample>
+```http
+POST /api/booking/reservations
+```
+</ResponseExample>
+
+Create a reservation from a shopping cart.
+
+**Request Body:**
+
+```json
+{
+  "data": {
+    "type": "reservations",
+    "attributes": {
+      "shopping_cart_id": "cart_456",
+      "travelers": [
+        {
+          "first_name": "John",
+          "last_name": "Doe",
+          "email": "john@example.com",
+          "phone": "+1234567890",
+          "document_type": "passport",
+          "document_number": "A1234567",
+          "birthdate": "1990-01-01",
+          "nationality": "US"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "reservation_789",
+    "type": "reservations",
+    "attributes": {
+      "reservation_number": "RES-2024-001234",
+      "status": "confirmed",
+      "tour_info": {
+        "name": "Amazing Tour Package",
+        "departure_date": "2024-08-15"
+      },
+      "travelers_count": 2,
+      "total_amount": 539.98,
+      "currency": "USD",
+      "created_at": "2024-07-01T12:00:00Z"
+    }
+  }
+}
+```
+
+### Get Reservation
+
+<ResponseExample>
+```http
+GET /api/booking/reservations/{id}
+```
+</ResponseExample>
+
+Retrieve reservation details.
+
+### Update Reservation
+
+<ResponseExample>
+```http
+PUT /api/booking/reservations/{id}
+```
+</ResponseExample>
+
+Update reservation information.
+
+### Cancel Reservation
+
+<ResponseExample>
+```http
+DELETE /api/booking/reservations/{id}
+```
+</ResponseExample>
+
+Cancel a reservation.
+
+## Payment Orders
+
+### Get Payment Order
+
+<ResponseExample>
+```http
+GET /api/booking/pay_orders/{id}
+```
+</ResponseExample>
+
+Retrieve payment order details.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `id` | string | Payment order ID |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "pay_order_101",
+    "type": "pay_orders",
+    "attributes": {
+      "order_number": "PAY-2024-001234",
+      "status": "pending",
+      "amount": 539.98,
+      "currency": "USD",
+      "payment_methods": ["credit_card", "bank_transfer"],
+      "expires_at": "2024-07-02T12:00:00Z",
+      "reservation": {
+        "id": "reservation_789",
+        "reservation_number": "RES-2024-001234"
+      }
+    }
+  }
+}
+```
+
+### Process Payment
+
+<ResponseExample>
+```http
+PUT /api/booking/pay_orders/{id}
+```
+</ResponseExample>
+
+Process payment for a payment order. Requires private token authentication.
+
+**Request Body:**
+
+```json
+{
+  "data": {
+    "type": "pay_orders",
+    "attributes": {
+      "payment_method": "credit_card",
+      "payment_data": {
+        "card_token": "tok_1234567890",
+        "cvv": "123"
+      }
+    }
+  }
+}
+```
+
+### Cancel Payment Order
+
+<ResponseExample>
+```http
+DELETE /api/booking/pay_orders/{id}
+```
+</ResponseExample>
+
+Cancel a payment order.
+
+### Print Payment Order
+
+<ResponseExample>
+```http
+GET /api/booking/pay_orders/{token}/imprimir
+```
+</ResponseExample>
+
+Generate PDF receipt for payment order.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `token` | string | Payment order token |
+
+**Response:** PDF file download
+
+## Billing Data
+
+### Create Billing Data
+
+<ResponseExample>
+```http
+POST /api/booking/billing_data
+```
+</ResponseExample>
+
+Create billing information for a reservation.
+
+**Request Body:**
+
+```json
+{
+  "data": {
+    "type": "billing_data",
+    "attributes": {
+      "reservation_id": "reservation_789",
+      "company_name": "Example Corp",
+      "tax_id": "12345678901",
+      "address": "123 Main St",
+      "city": "New York",
+      "country": "USA",
+      "postal_code": "10001",
+      "email": "billing@example.com"
+    }
+  }
+}
+```
+
+### Get Billing Data
+
+<ResponseExample>
+```http
+GET /api/booking/billing_data/{id}
+```
+</ResponseExample>
+
+Retrieve billing data details.
+
+### Update Billing Data
+
+<ResponseExample>
+```http
+PUT /api/booking/billing_data/{id}
+```
+</ResponseExample>
+
+Update billing information.
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| `CART_EXPIRED` | Shopping cart has expired |
+| `TOUR_NOT_AVAILABLE` | Tour is not available for selected dates |
+| `INVALID_COUPON` | Coupon code is invalid or expired |
+| `PAYMENT_FAILED` | Payment processing failed |
+| `INSUFFICIENT_STOCK` | Not enough availability for requested quantity |
+
+<Warning>
+All booking operations have time limits. Shopping carts expire after 30 minutes of inactivity, and payment orders expire after 24 hours.
+</Warning>

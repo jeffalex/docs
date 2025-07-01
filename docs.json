@@ -38,18 +38,29 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Getting Started",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "V1 API",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/v1-api",
+              "api-reference/booking-api"
+            ]
+          },
+          {
+            "group": "Partner Integration",
+            "pages": [
+              "api-reference/experience-bank-api"
+            ]
+          },
+          {
+            "group": "Internal APIs",
+            "pages": [
+              "api-reference/intranet-api",
+              "api-reference/tour-cms-webhooks"
             ]
           }
         ]
