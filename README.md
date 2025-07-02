@@ -1,4 +1,4 @@
-# [→ Guía Instalación Docker Turismoi API Global](https://turismoi.github.io/setup/api)
+# Guia Instalacion Docker Turismoi Api Global
 
 ## Para importar tours (dentro del bash del contenedor)
 
@@ -19,7 +19,7 @@ I18n.locale = :en
 TourDocument::TourRepositoryProxy.repository.create_index! force: true
 ```
 
-## Crear subdominios en /etc/hosts (máquina local)
+## Crear subdominios en /etc/hosts (maquina local)
 
 ```sh
 127.0.0.1       resellers.turismoi.test
@@ -49,7 +49,7 @@ docker container exec -i -u postgres $(docker-compose ps -q db) psql app_develop
 
 - bin/rails countries_importer:import
 
-# Preparar importación de un país (dev)
+# Prepararar importación de un pais (dev)
 
 Editar tours_importer.rake:
 
@@ -60,7 +60,7 @@ Editar tours_importer.rake:
   }
 ```
 
-con un token de Reseller del país. Si no tienes uno, créalo en el admin_panel desde el país origen.
+con un token de Reseller del pais. Si no tienes uno, crealo en el admin_panel desde el pais origen.
 
 Ahora podrás importar en español e inglés con
 
@@ -74,11 +74,11 @@ Ahora podrás importar en español e inglés con
 
 # Cómo reimportar tours al buscador
 
-1. Ingresar a una terminal de docker: ```docker-compose run --rm web bash```
+1. Ingresar a una terminal de docker: \`\`\`docker-compose run --rm web bash\`\`\`\`
 2. Correr terminal de Rails: `rails c`
 3. Correr el comando para eliminar datos en Español: `I18n.locale = :es; TourDocument::TourRepositoryProxy.repository.create_index! force: true`
 4. Correr el comando para eliminar datos en Inglés: `I18n.locale = :en; TourDocument::TourRepositoryProxy.repository.create_index! force: true; exit`
-5. Correr tareas rake para importar todos los países e idiomas en dev:
+5. Correr tareas rake para importar todos los paises e idiomas en dev:
 
 - rails tours_importer:import_from[co,es]
 - rails tours_importer:import_from[co,en]
@@ -89,9 +89,9 @@ Ahora podrás importar en español e inglés con
 
 # MODO SPEEDY
 
-Con el modo Speedy se podrá correr una versión similar a producción, lo cual reduce el consumo de RAM y CPU y
+Con el modo Speedy se podrá correr una version similar a producción, lo cual reduce el consumo de RAM y CPU y
 aumenta la velocidad de carga de los proyectos. El contra es que no se debe usar para desarrollo ya que tiene
-las siguientes limitaciones: Los cambios que hagan en código y posiblemente en css no se verán reflejados. Deben reiniciar el server.
+las siguientes limitaciones: Lo cambios que hagan en código y posiblemente en css no se verán reflejados. Deben reiniciar el server.
 
 Para correr el modo speedy usar este comando:
 
