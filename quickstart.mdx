@@ -11,7 +11,7 @@ This guide will help you make your first API calls to Turismoi API Global and un
 
 Before you begin, make sure you have:
 
-- API credentials (contact support@turismoi.com)
+- API credentials (contact support@tourshub.org)
 - Basic understanding of REST APIs
 - An HTTP client tool (curl, Postman, or similar)
 
@@ -21,7 +21,7 @@ Most Turismoi API endpoints use JWT (JSON Web Token) authentication. Include you
 
 ```bash
 curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  https://api.turismoi.com/api/tours
+  https://api.tourshub.org/api/tours
 ```
 
 <Note>
@@ -35,13 +35,13 @@ Let's start by searching for available tours:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET "https://api.turismoi.com/api/tours?search=adventure&language=en&per_page=5" \
+curl -X GET "https://api.tourshub.org/api/tours?search=adventure&language=en&per_page=5" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Accept: application/json"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.turismoi.com/api/tours?search=adventure&language=en&per_page=5', {
+const response = await fetch('https://api.tourshub.org/api/tours?search=adventure&language=en&per_page=5', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer YOUR_JWT_TOKEN',
@@ -68,7 +68,7 @@ params = {
 }
 
 response = requests.get(
-    'https://api.turismoi.com/api/tours',
+    'https://api.tourshub.org/api/tours',
     headers=headers,
     params=params
 )
@@ -92,7 +92,7 @@ $params = http_build_query([
 
 $curl = curl_init();
 curl_setopt_array($curl, [
-    CURLOPT_URL => "https://api.turismoi.com/api/tours?{$params}",
+    CURLOPT_URL => "https://api.tourshub.org/api/tours?{$params}",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => $headers,
 ]);
@@ -148,13 +148,13 @@ Once you find a tour of interest, get detailed information:
 <CodeGroup>
 
 ```bash cURL
-curl -X GET "https://api.turismoi.com/api/tours/tour_123" \
+curl -X GET "https://api.tourshub.org/api/tours/tour_123" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Accept: application/json"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.turismoi.com/api/tours/tour_123', {
+const response = await fetch('https://api.tourshub.org/api/tours/tour_123', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer YOUR_JWT_TOKEN',
@@ -168,7 +168,7 @@ console.log(tourDetails);
 
 ```python Python
 response = requests.get(
-    'https://api.turismoi.com/api/tours/tour_123',
+    'https://api.tourshub.org/api/tours/tour_123',
     headers=headers
 )
 
@@ -185,7 +185,7 @@ To book a tour, first create a shopping cart:
 <CodeGroup>
 
 ```bash cURL
-curl -X POST "https://api.turismoi.com/api/booking/shopping_carts" \
+curl -X POST "https://api.tourshub.org/api/booking/shopping_carts" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/vnd.api+json" \
   -d '{
@@ -218,7 +218,7 @@ const cartData = {
   }
 };
 
-const response = await fetch('https://api.turismoi.com/api/booking/shopping_carts', {
+const response = await fetch('https://api.tourshub.org/api/booking/shopping_carts', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_JWT_TOKEN',
@@ -249,7 +249,7 @@ cart_data = {
 }
 
 response = requests.post(
-    'https://api.turismoi.com/api/booking/shopping_carts',
+    'https://api.tourshub.org/api/booking/shopping_carts',
     headers={
         'Authorization': 'Bearer YOUR_JWT_TOKEN',
         'Content-Type': 'application/vnd.api+json'
@@ -292,7 +292,7 @@ Convert your shopping cart into a reservation:
 <CodeGroup>
 
 ```bash cURL
-curl -X POST "https://api.turismoi.com/api/booking/reservations" \
+curl -X POST "https://api.tourshub.org/api/booking/reservations" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/vnd.api+json" \
   -d '{
@@ -359,7 +359,7 @@ const reservationData = {
   }
 };
 
-const response = await fetch('https://api.turismoi.com/api/booking/reservations', {
+const response = await fetch('https://api.tourshub.org/api/booking/reservations', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_JWT_TOKEN',
@@ -420,7 +420,7 @@ let page = 1;
 let allTours = [];
 
 do {
-  const response = await fetch(`https://api.turismoi.com/api/tours?page=${page}&per_page=25`, {
+  const response = await fetch(`https://api.tourshub.org/api/tours?page=${page}&per_page=25`, {
     headers: { 'Authorization': 'Bearer YOUR_JWT_TOKEN' }
   });
   
@@ -488,7 +488,7 @@ Now that you've completed the basic workflow, explore more advanced features:
 
 Use our sandbox environment for testing:
 
-- **Sandbox Base URL**: `https://sandbox-api.turismoi.com/`
+- **Sandbox Base URL**: `https://sandbox-api.tourshub.org/`
 - **Test Cards**: Use test payment methods provided by our support team
 - **Test Data**: Sandbox contains sample tours and data for testing
 
@@ -500,7 +500,7 @@ Never use production credentials in your development environment. Always use san
 
 If you need help:
 
-- **Technical Support**: support@turismoi.com
+- **Technical Support**: support@tourshub.org
 - **Documentation Issues**: Report issues via GitHub
 - **Integration Consultation**: Schedule a call with our technical team
 

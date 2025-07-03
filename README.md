@@ -1,6 +1,6 @@
-# Guia Instalacion Docker Turismoi Api Global
+# [→ Docker Installation Guide Tourshub API Global](https://tourshub.github.io/setup/api)
 
-## Para importar tours (dentro del bash del contenedor)
+## To import tours (inside the container bash)
 
 ```sh
 rails tours_importer:import_from[co,es]
@@ -14,17 +14,17 @@ bin/rails countries_importer:import
 exit
 docker-compose up
 
-#Note: Para crear repositorios de ElasticSearch en inglés, correr los comandos:
+#Note: To create ElasticSearch repositories in English, run the commands:
 I18n.locale = :en
 TourDocument::TourRepositoryProxy.repository.create_index! force: true
 ```
 
-## Crear subdominios en /etc/hosts (maquina local)
+## Create subdomains in /etc/hosts (local machine)
 
 ```sh
-127.0.0.1       resellers.turismoi.test
-127.0.0.1       proveedores.turismoi.test
-127.0.0.1       saas.turismoi.test
+127.0.0.1       resellers.tourshub.test
+127.0.0.1       providers.tourshub.test
+127.0.0.1       saas.tourshub.test
 ```
 
 ## Backup Database
@@ -36,7 +36,7 @@ docker-compose exec db pg_dump -U postgres app_development >apiglobal.sql
 
 ## Restore Database
 
-Se puede descargar una copia del apiglobal.sql desde https://drive.google.com/open?id=17Z22k8gzXK0Nfq0ujAzHUtcpwJVbxdYH
+You can download a copy of apiglobal.sql from https://drive.google.com/open?id=17Z22k8gzXK0Nfq0ujAzHUtcpwJVbxdYH
 
 ```bash
 docker-compose up
@@ -49,36 +49,36 @@ docker container exec -i -u postgres $(docker-compose ps -q db) psql app_develop
 
 - bin/rails countries_importer:import
 
-# Prepararar importación de un pais (dev)
+# Prepare country import (dev)
 
 Editar tours_importer.rake:
 
 ```
   'mx' => {
     url: 'http://app:3010/api/v1/api_global_packages.json',
-    token: 'COLOCAR_TOKEN_AQUI'
+    token: 'PLACE_TOKEN_HERE'
   }
 ```
 
-con un token de Reseller del pais. Si no tienes uno, crealo en el admin_panel desde el pais origen.
+with a Reseller token from the country. If you don't have one, create it in the admin_panel from the origin country.
 
-Ahora podrás importar en español e inglés con
+Now you can import in Spanish and English with
 
 - rails tours_importer:import_from[mx , es]
 - rails tours_importer:import_from[mx , en]
 
-# Cómo usar ByeBug:
+# How to use ByeBug:
 
-1. Colocar comando `byebug` en la línea de código que se desea depurar
-2. Correr en una terminal: `docker attach api-global_web_1`
+1. Place the `byebug` command on the line of code you want to debug
+2. Run in a terminal: `docker attach api-global_web_1`
 
-# Cómo reimportar tours al buscador
+# How to reimport tours to the search engine
 
-1. Ingresar a una terminal de docker: \`\`\`docker-compose run --rm web bash\`\`\`\`
-2. Correr terminal de Rails: `rails c`
-3. Correr el comando para eliminar datos en Español: `I18n.locale = :es; TourDocument::TourRepositoryProxy.repository.create_index! force: true`
-4. Correr el comando para eliminar datos en Inglés: `I18n.locale = :en; TourDocument::TourRepositoryProxy.repository.create_index! force: true; exit`
-5. Correr tareas rake para importar todos los paises e idiomas en dev:
+1. Enter a docker terminal: ```docker-compose run --rm web bash```
+2. Run Rails terminal: `rails c`
+3. Run the command to delete data in Spanish: `I18n.locale = :es; TourDocument::TourRepositoryProxy.repository.create_index! force: true`
+4. Run the command to delete data in English: `I18n.locale = :en; TourDocument::TourRepositoryProxy.repository.create_index! force: true; exit`
+5. Run rake tasks to import all countries and languages in dev:
 
 - rails tours_importer:import_from[co,es]
 - rails tours_importer:import_from[co,en]
@@ -89,10 +89,10 @@ Ahora podrás importar en español e inglés con
 
 # MODO SPEEDY
 
-Con el modo Speedy se podrá correr una version similar a producción, lo cual reduce el consumo de RAM y CPU y
-aumenta la velocidad de carga de los proyectos. El contra es que no se debe usar para desarrollo ya que tiene
-las siguientes limitaciones: Lo cambios que hagan en código y posiblemente en css no se verán reflejados. Deben reiniciar el server.
+With Speedy mode you can run a version similar to production, which reduces RAM and CPU consumption and
+increases project loading speed. The downside is that it should not be used for development as it has
+the following limitations: Changes made to code and possibly CSS will not be reflected. You must restart the server.
 
-Para correr el modo speedy usar este comando:
+To run speedy mode use this command:
 
 `docker-compose -f docker-compose-speedy.yml up`

@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Turismoi API Global",
+  "name": "Tourshub API Global",
   "colors": {
     "primary": "#2563EB",
     "light": "#3B82F6",
@@ -93,21 +93,21 @@
   "navbar": {
     "links": [
       {
-        "label": "Soporte",
-        "href": "mailto:support@turismoi.com"
+        "label": "Support",
+        "href": "mailto:support@tourshub.org"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://turismoi.com/dashboard"
+      "href": "https://tourshub.org/dashboard"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/turismoi",
-      "github": "https://github.com/turismoi",
-      "linkedin": "https://linkedin.com/company/turismoi"
+      "x": "https://x.com/tourshub",
+      "github": "https://github.com/tourshub",
+      "linkedin": "https://linkedin.com/company/tourshub"
     }
   }
 }
