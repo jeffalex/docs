@@ -1,43 +1,153 @@
 ---
-title: "Introduction"
-description: "Welcome to the home of your new documentation"
+title: 'Tourshub API Global Documentation'
+description: 'Comprehensive API documentation for the Tourshub tourism platform'
 sidebarTitle: "Tourshub"
 ---
 
 <img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Tourshub API Documentation"
+/>
+<img
   className="hidden dark:block"
-  src="/images/hero-dark.png"
-  alt="Hero Dark"
+  src="/images/hero-dark.svg"
+  alt="Tourshub API Documentation"
 />
 
-## Setting up
+## Welcome to Tourshub API Global
 
-The first step to world-class documentation is setting up your editing environments.
+Tourshub API Global is a comprehensive tourism platform that provides booking services, tour management, and partner integrations. Our APIs enable you to integrate with our platform to create powerful tourism applications and services.
 
 <CardGroup cols={2}>
-  <Card title="Edit Your Docs" icon="pen-to-square" href="https://mintlify.com/docs/quickstart">
-    Get your docs set up locally for easy development
+  <Card
+    title="V1 API"
+    icon="map"
+    href="/api-reference/v1-api"
+  >
+    Main booking and tour management API with search, filtering, and tour details
   </Card>
-  <Card title="Preview Changes" icon="image" href="https://mintlify.com/docs/development">
-    Preview your changes before you push to make sure they're perfect
+  <Card
+    title="Booking API"
+    icon="calendar"
+    href="/api-reference/booking-api"
+  >
+    Complete booking workflow from cart creation to payment processing
+  </Card>
+  <Card
+    title="Experience Bank Partner API"
+    icon="handshake"
+    href="/api-reference/experience-bank-api"
+  >
+    External partner integration API for tour operators using HMAC authentication
+  </Card>
+  <Card
+    title="Internal APIs"
+    icon="server"
+    href="/api-reference/intranet-api"
+  >
+    Internal system integration for data synchronization and webhook processing
   </Card>
 </CardGroup>
 
-## Make it yours
+## Quick Start
 
-Update your docs to your brand and add valuable content for the best user conversion.
+Get started with the Tourshub API in just a few steps:
+
+<Steps>
+  <Step title="Get API Credentials">
+    Contact support@tourshub.org to obtain your API credentials and access tokens.
+  </Step>
+  <Step title="Choose Your Integration">
+    Select the appropriate API based on your use case:
+    - **V1 API** for standard booking applications
+    - **Experience Bank Partner API** for tour operator integration
+    - **Internal APIs** for system-to-system communication
+  </Step>
+  <Step title="Make Your First Request">
+    Start with a simple tour search request to test your integration.
+  </Step>
+  <Step title="Implement Booking Flow">
+    Build your booking workflow using our shopping cart and reservation APIs.
+  </Step>
+</Steps>
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Multi-language Support" icon="globe">
+    Spanish and English language support across all endpoints
+  </Card>
+  <Card title="Real-time Availability" icon="clock">
+    Live inventory and pricing updates with instant confirmation
+  </Card>
+  <Card title="Advanced Search" icon="magnifying-glass">
+    Powerful filtering and search capabilities with Elasticsearch
+  </Card>
+  <Card title="Secure Authentication" icon="shield">
+    Multiple authentication methods including JWT, HMAC, and private tokens
+  </Card>
+  <Card title="Partner Integration" icon="link">
+    Comprehensive partner APIs for external tour operators
+  </Card>
+  <Card title="Webhook Support" icon="bell">
+    Real-time notifications and CMS integration capabilities
+  </Card>
+</CardGroup>
+
+## Authentication Methods
+
+Tourshub API supports multiple authentication methods depending on your use case:
+
+| Method | Use Case | Documentation |
+|--------|----------|---------------|
+| **JWT Tokens** | Standard API access | [V1 API](/api-reference/v1-api) |
+| **Private Tokens** | Sensitive booking operations | [Booking API](/api-reference/booking-api) |
+| **HMAC Signatures** | Partner integrations | [Experience Bank API](/api-reference/experience-bank-api) |
+| **Basic Auth** | Internal system access | [Intranet API](/api-reference/intranet-api) |
+
+## API Endpoints Overview
+
+### V1 API (`/api/`)
+- Tour search and filtering
+- Location and currency data
+- Authentication token management
+
+### Booking API (`/api/booking/`)
+- Shopping cart management
+- Reservation creation and management
+- Payment processing
+- Billing data handling
+
+### Experience Bank Partner API (`experiencebank.domain/`)
+- Activity listings for partners
+- Availability checks
+- Partner booking management
+- Cancellation handling
+
+### Internal APIs
+- **Intranet API**: Data synchronization and order management
+- **Tour CMS Webhooks**: Content management and booking notifications
+
+<Note>
+All APIs support both sandbox and production environments. Contact our support team for access to the appropriate environment for your needs.
+</Note>
+
+## Support and Resources
 
 <CardGroup cols={2}>
-  <Card title="Customize Style" icon="palette" href="https://mintlify.com/docs/settings/global">
-    Customize your docs to your company's colors and brands
+  <Card
+    title="API Support"
+    icon="envelope"
+    href="mailto:support@tourshub.org"
+  >
+    Get help with integration and technical questions
   </Card>
-  <Card title="Reference APIs" icon="code" href="https://mintlify.com/docs/api-playground/openapi">
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card title="Add Components" icon="screwdriver-wrench" href="https://mintlify.com/docs/content/components/accordions">
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card title="Get Inspiration" icon="stars" href="https://mintlify.com/customers">
-    Check out our showcase of our favorite documentation
+  <Card
+    title="Dashboard"
+    icon="chart-line"
+    href="https://tourshub.org/dashboard"
+  >
+    Access your account dashboard and API management tools
   </Card>
 </CardGroup>
