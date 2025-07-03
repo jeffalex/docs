@@ -2,6 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Tourshub API Global",
+  "hidePoweredBy": true,
   "colors": {
     "primary": "#2563EB",
     "light": "#3B82F6",
@@ -14,22 +15,10 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Configuration",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Docker",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "quickstart"
             ]
           }
         ]
@@ -69,19 +58,19 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "anchor": "API Documentation",
+          "href": "/api-reference/introduction",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "Support",
+          "href": "mailto:support@tourshub.org",
+          "icon": "envelope"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Dashboard",
+          "href": "https://tourshub.org/dashboard",
+          "icon": "chart-line"
         }
       ]
     }
